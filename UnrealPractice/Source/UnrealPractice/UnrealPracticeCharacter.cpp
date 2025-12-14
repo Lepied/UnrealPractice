@@ -11,12 +11,17 @@
 #include "EnhancedInputSubsystems.h"
 #include "InputActionValue.h"
 #include "UnrealPractice.h"
+#include "Blueprint/UserWidget.h"
+#include "EnhancedInputComponent.h"
+#include "EnhancedInputSubsystems.h"
+#include "Kismet/GameplayStatics.h"
+#include "DiceJokboSubSystem.h"
 
 AUnrealPracticeCharacter::AUnrealPracticeCharacter()
 {
 	// Set size for collision capsule
 	GetCapsuleComponent()->InitCapsuleSize(42.f, 96.0f);
-		
+
 	// Don't rotate when the controller rotates. Let that just affect the camera.
 	bUseControllerRotationPitch = false;
 	bUseControllerRotationYaw = false;
@@ -46,15 +51,16 @@ AUnrealPracticeCharacter::AUnrealPracticeCharacter()
 	FollowCamera->SetupAttachment(CameraBoom, USpringArmComponent::SocketName);
 	FollowCamera->bUsePawnControlRotation = false;
 
-	// Note: The skeletal mesh and anim blueprint references on the Mesh component (inherited from Character) 
+	// Note: The skeletal mesh and anim blueprint references on the Mesh component (inherited from Character)
 	// are set in the derived blueprint asset named ThirdPersonCharacter (to avoid direct content references in C++)
 }
 
-void AUnrealPracticeCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
+void AUnrealPracticeCharacter::SetupPlayerInputComponent(UInputComponent *PlayerInputComponent)
 {
 	// Set up action bindings
-	if (UEnhancedInputComponent* EnhancedInputComponent = Cast<UEnhancedInputComponent>(PlayerInputComponent)) {
-		
+	if (UEnhancedInputComponent *EnhancedInputComponent = Cast<UEnhancedInputComponent>(PlayerInputComponent))
+	{
+
 		// Jumping
 		EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Started, this, &ACharacter::Jump);
 		EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Completed, this, &ACharacter::StopJumping);
@@ -70,9 +76,14 @@ void AUnrealPracticeCharacter::SetupPlayerInputComponent(UInputComponent* Player
 	{
 		UE_LOG(LogUnrealPractice, Error, TEXT("'%s' Failed to find an Enhanced Input component! This template is built to use the Enhanced Input system. If you intend to use the legacy system, then you will need to update this C++ file."), *GetNameSafe(this));
 	}
+
+	if (UEnhancedInputComponent *EnhancedInputComponent = Cast<UEnhancedInputComponent>(PlayerInputComponent))
+	{
+		EnhancedInputComponent->BindAction(RollAction, ETriggerEvent::Started, this, &AUnrealPracticeCharacter::ToggleDiceUI);
+	}
 }
 
-void AUnrealPracticeCharacter::Move(const FInputActionValue& Value)
+void AUnrealPracticeCharacter::Move(const FInputActionValue &Value)
 {
 	// input is a Vector2D
 	FVector2D MovementVector = Value.Get<FVector2D>();
@@ -81,7 +92,7 @@ void AUnrealPracticeCharacter::Move(const FInputActionValue& Value)
 	DoMove(MovementVector.X, MovementVector.Y);
 }
 
-void AUnrealPracticeCharacter::Look(const FInputActionValue& Value)
+void AUnrealPracticeCharacter::Look(const FInputActionValue &Value)
 {
 	// input is a Vector2D
 	FVector2D LookAxisVector = Value.Get<FVector2D>();
@@ -101,10 +112,10 @@ void AUnrealPracticeCharacter::DoMove(float Right, float Forward)
 		// get forward vector
 		const FVector ForwardDirection = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::X);
 
-		// get right vector 
+		// get right vector
 		const FVector RightDirection = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::Y);
 
-		// add movement 
+		// add movement
 		AddMovementInput(ForwardDirection, Forward);
 		AddMovementInput(RightDirection, Right);
 	}
@@ -130,4 +141,61 @@ void AUnrealPracticeCharacter::DoJumpEnd()
 {
 	// signal the character to stop jumping
 	StopJumping();
+}
+
+// ui 토글
+void AUnrealPracticeCharacter::ToggleDiceUI()
+{
+	if(GEngine) GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Magenta, TEXT("K키 입력 감지됨!"));
+
+    if (DiceWidgetClass == nullptr) 
+    {
+        if(GEngine) GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("위젯 클래스가 없음 (None)"));
+        return;
+    }
+	if (CurrentDiceWidget)
+	{
+		CurrentDiceWidget->RemoveFromParent();
+		CurrentDiceWidget = nullptr;
+
+		return;
+	}
+
+	if (DiceWidgetClass)
+	{
+		// UI 생성
+		CurrentDiceWidget = CreateWidget<UUserWidget>(GetWorld(), DiceWidgetClass);
+		if (CurrentDiceWidget)
+		{
+			CurrentDiceWidget->AddToViewport(); // 화면에 부착
+		}
+	}
+}
+
+void AUnrealPracticeCharacter::PerformAttack(const TArray<int32>& DiceResults)
+{
+    //서브시스템 가져오기
+    UGameInstance* GI = GetGameInstance();
+    UDiceJokboSubsystem* JokboSystem = GI ? GI->GetSubsystem<UDiceJokboSubsystem>() : nullptr;
+
+    if (JokboSystem)
+    {
+        // 가능한 족보 긁어오기
+        TArray<FAchievedJokbo> Options = JokboSystem->GetAchievableJokbos(DiceResults);
+
+        // 바로 공격하지 말고 UI표시
+        ShowJokboSelection(Options);
+    }
+}
+
+void AUnrealPracticeCharacter::ProcessFinalAttack(FAchievedJokbo SelectedJokbo)
+{
+
+	FString LogMsg = FString::Printf(TEXT("공격! [%s] 데미지: %d"), *SelectedJokbo.Description, SelectedJokbo.FinalDamage);
+    if(GEngine) GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Cyan, LogMsg);
+	// 실제 데미지 처리 로직여기서하기
+
+	// 기존 UI 끄기
+	ToggleDiceUI();
+	// TODO: 공격 로직이나 애니메이션
 }

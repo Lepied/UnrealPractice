@@ -1,5 +1,21 @@
 [
 	{
+		"file": "C:\\Users\\gang\\Documents\\Unreal Projects\\unrealPractice\\UnrealPractice\\Source\\UnrealPractice\\DiceJokboSubSystem.cpp",
+		"arguments": [
+			"C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.44.35207\\bin\\Hostx64\\x64\\cl.exe",
+			"@C:\\Users\\gang\\Documents\\Unreal Projects\\unrealPractice\\UnrealPractice\\.vscode\\compileCommands_Default\\UnrealPractice.1.rsp"
+		],
+		"directory": "C:\\Program Files\\Epic Games\\UE_5.7\\Engine\\Source"
+	},
+	{
+		"file": "C:\\Users\\gang\\Documents\\Unreal Projects\\unrealPractice\\UnrealPractice\\Source\\UnrealPractice\\DiceJokboSubSystem.h",
+		"arguments": [
+			"C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.44.35207\\bin\\Hostx64\\x64\\cl.exe",
+			"@C:\\Users\\gang\\Documents\\Unreal Projects\\unrealPractice\\UnrealPractice\\.vscode\\compileCommands_Default\\UnrealPractice.1.rsp"
+		],
+		"directory": "C:\\Program Files\\Epic Games\\UE_5.7\\Engine\\Source"
+	},
+	{
 		"file": "C:\\Users\\gang\\Documents\\Unreal Projects\\unrealPractice\\UnrealPractice\\Source\\UnrealPractice\\UnrealPractice.Build.cs",
 		"arguments": [
 			"C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.44.35207\\bin\\Hostx64\\x64\\cl.exe",
