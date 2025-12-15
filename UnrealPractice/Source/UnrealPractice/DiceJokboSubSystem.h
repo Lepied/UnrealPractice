@@ -4,6 +4,8 @@
 #include "Subsystems/GameInstanceSubsystem.h"
 #include "DiceJokboSubsystem.generated.h"
 
+constexpr int32 MAX_DICE_VALUE = 20;
+
 // 달성된 족보 정보 UI용
 USTRUCT(BlueprintType)
 struct FAchievedJokbo
@@ -27,7 +29,7 @@ struct FJokboDefinition
     int32 BaseDamage;
     int32 BaseGold;
 
-    // 조건 검사 함수 (리스트 -> bool)
+    // 조건 검사 함수 
     TFunction<bool(const TArray<int32>&)> CheckLogic;
 
     //가변 데미지 계산 함수
@@ -55,10 +57,17 @@ public:
     UFUNCTION(BlueprintCallable, Category = "Jokbo")
     TArray<FAchievedJokbo> GetAchievableJokbos(const TArray<int32>& DiceValues);
 
+    
+    // 성능 측정용 함수
+    UFUNCTION(BlueprintCallable, Category = "Debug")
+    void RunBenchmark();
+
 private:
     // 족보 정의 리스트
     TArray<FJokboDefinition> AllJokbos;
 
     // 내부 헬퍼 함수 숫자 빈도수세기
-    TMap<int32, int32> GetDiceCounts(const TArray<int32>& DiceValues);
+    //TMap 안쓰고 스택 배열을 받아 채워넣는 방식으로 바꾸기. 힙메모리 할당줄이려고.
+	void CountDiceFrequency(const TArray<int32>& DiceValues, int32 (&OutCounts)[MAX_DICE_VALUE + 1]);
+
 };
