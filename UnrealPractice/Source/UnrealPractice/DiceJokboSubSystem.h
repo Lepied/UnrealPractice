@@ -30,7 +30,7 @@ struct FJokboDefinition
     // 조건 검사 함수 (리스트 -> bool)
     TFunction<bool(const TArray<int32>&)> CheckLogic;
 
-    // (옵션) 가변 데미지 계산 함수 (리스트 -> int32)
+    //가변 데미지 계산 함수
     TFunction<int32(const TArray<int32>&)> DamageCalcLogic;
     TFunction<int32(const TArray<int32>&)> GoldCalcLogic;
 

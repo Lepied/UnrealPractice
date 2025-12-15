@@ -193,7 +193,9 @@ void AUnrealPracticeCharacter::ProcessFinalAttack(FAchievedJokbo SelectedJokbo)
 
 	FString LogMsg = FString::Printf(TEXT("공격! [%s] 데미지: %d"), *SelectedJokbo.Description, SelectedJokbo.FinalDamage);
     if(GEngine) GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Cyan, LogMsg);
-	// 실제 데미지 처리 로직여기서하기
+	
+	// 실제 데미지 처리
+	OnExecuteAttack(SelectedJokbo.FinalDamage, SelectedJokbo.Description);
 
 	// 기존 UI 끄기
 	ToggleDiceUI();

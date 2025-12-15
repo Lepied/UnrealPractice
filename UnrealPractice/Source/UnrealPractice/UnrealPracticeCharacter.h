@@ -111,9 +111,13 @@ public:
     UFUNCTION(BlueprintCallable, Category = "Dice Combat")
     void PerformAttack(const TArray<int32>& DiceResults);
 
-	// [신규] 유저가 리스트에서 버튼을 눌렀을 때 호출할 "진짜 공격" 함수
+	// 유저가 리스트에서 버튼을 눌렀을 때 호출할  함수
     UFUNCTION(BlueprintCallable, Category = "Dice Combat")
     void ProcessFinalAttack(FAchievedJokbo SelectedJokbo);
+
+	// 실제 공격 실행
+	UFUNCTION(BlueprintImplementableEvent, Category = "Attack")
+    void OnExecuteAttack(float DamageAmount, const FString& JokboName);
 
 protected:
 	//UI 토글

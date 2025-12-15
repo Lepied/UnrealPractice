@@ -38,7 +38,7 @@ void UDiceJokboSubsystem::Initialize(FSubsystemCollectionBase& Collection)
             for (auto& Elem : Counts) {
                 if (Elem.Value == 3) bThree = true;
                 else if (Elem.Value == 2) bTwo = true;
-                // 야찌(5개)인 경우도 풀하우스로 쳐줄지 로직에 따라 결정하기, 지금은 정확히 3,2만해주기
+                // 야찌인 경우도 풀하우스로 쳐줄지 로직에 따라 결정하기, 지금은 정확히 3,2만해주기
                 if(Elem.Value == 5) return true; 
             }
             return bThree && bTwo;
